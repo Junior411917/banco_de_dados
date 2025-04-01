@@ -1,0 +1,82 @@
+Código do exercício 6 quase pronto.
+
+CREATE TABLE autores(
+    id_autor SERIAL PRIMARY KEY,
+    nome VARCHAR(255)
+);
+
+CREATE TABLE livro(
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    id_autor INT NOT NULL,
+    ano_publicacao INT NOT NULL,
+    genero VARCHAR(100) NOT NULL,
+    quantidade_estoque INT NOT NULL,
+    editora VARCHAR(100),
+    FOREIGN KEY (id_autor) REFERENCES autores (id_autor)
+);
+
+
+INSERT INTO autores (nome) VALUES
+('Leonardo Kanti'),
+('Marcos Suzi'),
+('Matheus Marques'),
+('Aline Santos'),
+('Marcela Bouch'),
+('Ana Bla'),
+('Alice Pouch'),
+('Maurício Gomez'),
+('Zhiu Wang'),
+('Chavelli Blarg');
+
+
+INSERT INTO livro (titulo, id_autor, ano_publicacao, genero, quantidade_estoque, editora) VALUES
+('AS Caixas', 1, 2025, 'Comédia', 4, 'Editora AL'),
+('AD Block Louco', 2, 2022, 'Comédia', 3, 'Editora BL'),
+('Olho de gude', 3, 2020, 'Terror', 7, 'Editora CL'),
+('O carro', 4, 1995, 'Romance', 2, 'Editora DL'),
+('A TV de Marte', 5, 2020, 'Ficção Científica', 20, 'Editora EL'),
+('A Lua que ri', 6, 2021, 'Romance', 5, 'Editora FL'),
+('O Piano vermelho', 7, 2024, 'Terror', 17, 'Editora GL'),
+('O Gato que ri', 8, 1991, 'Terror', 21, 'Editora HL'),
+('Game Science', 9, 2024, 'Suspense', 6, 'Editora IL'),
+('A Caixa que não fecha', 10, 2025, 'Terror', 1, 'Editora JL');
+
+CREATE TABLE usuarios(
+    id_usuario SERIAL PRIMARY KEY,
+    nome VARCHAR(255)
+);
+
+CREATE TABLE emprestimos(
+    id_emprestimo SERIAL PRIMARY KEY,
+    id_livro INT,
+    id_usuario INT,
+    data_emprestimo DATE,
+    data_devolucao DATE,
+    status VARCHAR(50),
+    FOREIGN KEY (id_livro) REFERENCES livro (id),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
+);
+--Comando para criar um índice na tabela para melhorar a busca pelo campo título:
+CREATE INDEX idx_livro_titulo ON livro (titulo);
+
+--Comando para criar um índice na tabela emprestimo para otimizar a busca por data_emprestimo:
+CREATE INDEX idx_emprestimos_data_emprestimo ON emprestimos (data_emprestimo); --Alimentar com dados.
+
+--Comando para criar uma view chamada vw_historico_emprestimos:
+CREATE VIEW vw_historico_emprestimos AS SELECT u.nome AS nome_usuario, l.titulo 
+AS titulo_livro, e.data_emprestimo, e.data_devolucao FROM usuarios u 
+JOIN emprestimos e ON u.id_usuario = e.id_usuario JOIN livro l ON e.id_livro = l.id; --Alimentar com dados.
+
+--Resposta da 4ª pergunta:
+-- Um índice pode melhorar a performance de uma consulta por meio da aceleração da consulta de dados; altamente recomendável para tabelas grandes.
+-- No entanto, como um ponto negativo, podemos destacar: o aumento do espaço em disco; lentidão da operação de escrita, já que os índices precisam ser autualizados; e sobrecarga do otimizador de consultas.
+
+--Comando para a criação do índice:
+CREATE INDEX idx_livro_titulo ON livro (titulo);
+
+--Comando para o teste sem o índice:
+EXPLAIN ANALYZE SELECT * FROM livro WHERE titulo = 'O carro';
+
+--Comando de remoção do índice para que o teste possa ser feito novamente:
+DROP INDEX idx_livro_titulo;
