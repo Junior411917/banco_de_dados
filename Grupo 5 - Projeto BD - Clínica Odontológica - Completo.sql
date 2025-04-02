@@ -1,4 +1,4 @@
---Grupo 5 - Projeto BD - Veterinaria
+--Grupo 5 - Projeto BD - Clínica Odontológica
 
 -- Criação da tabela Atendente
 CREATE TABLE Atendente (
